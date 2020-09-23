@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from enum import Enum
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -36,3 +37,8 @@ class Company(models.Model):
 
     class Meta:
         verbose_name_plural = "Companies"
+
+class Solution(models.Model):
+    uuid = models.UUIDField(primary_key = True, default=uuid.uuid4, editable=True)
+    programText = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

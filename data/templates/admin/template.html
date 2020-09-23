@@ -1,0 +1,12 @@
+{% extends 'admin/change_list.html' %}
+{% load static %}
+{% block object-tools %}
+<form action="/api/task/" method="GET">
+    <input type="text" name="type" id="type" value="unread" hidden />
+    <input id="update_episodes" value="Read unreaded messages" type="submit" />
+</form>
+
+<br />
+{{ block.super }}
+<script src="{% static 'data/readData.js' %}"></script>
+{% endblock %}

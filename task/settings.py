@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os
 
 from pathlib import Path
 
@@ -25,7 +26,23 @@ SECRET_KEY = 'ru4wt*f3d9c)b7ub%pza9oeit40d-8iw+(@85o(z0lzgawv%&m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    )
+}
+
+ALLOWED_HOSTS = [
+    'testenglish.spdns.eu',
+    'nettel.spdns.eu',
+    '0.0.0.0',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -120,8 +137,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 EMAIL = {
     'EMAIL': 'edor.k.v@gmail.com',
     'PASSWORD': 'dragonegor12345'
 }
+
+ACCOUNT_ACTIVATION_DAYS = 7

@@ -1,12 +1,23 @@
-# i ball wash rot
-
 from rest_framework import serializers
-from .models import Task, Company, Difficulty
+from .models import Task, Company, Difficulty, Solution
+from django.contrib.auth.models import User
 from .mailparse import MailParse
 from task import settings
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 import re
+import json
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 mailparse = MailParse(settings.EMAIL['EMAIL'], settings.EMAIL["PASSWORD"])
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "password"]
+    
+    def 
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -21,12 +32,12 @@ class TaskSerializer(serializers.ModelSerializer):
         Company.objects.all().delete()
 
         messages = mailparse.getAllMessages()
-        TaskSerializer.uploadData(messages)
+        print(TaskSerializer.uploadData(messages))
 
     @staticmethod
     def uploadUnreadMessages():
         messages = mailparse.getUnreadMessages()
-        TaskSerializer.uploadData(messages)
+        return TaskSerializer.uploadData(messages)
 
     @staticmethod
     def uploadData(messages):
@@ -80,4 +91,24 @@ class TaskSerializer(serializers.ModelSerializer):
                     Task.objects.create(number=taskDictionary['Number'], difficulty=Difficulty.objects.get(
                         levelOfDiff=taskDictionary['Difficulty']), company=Company.objects.get(name=taskDictionary['Company']), taskText=taskDictionary['Text'])
                     addedTasks += 1
-        print(f'Added {addedTasks} tasks')
+        return f'Added {addedTasks} tasks'
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = '__all__'
+
+class SolutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Solution
+        fields = '__all__'
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+
+        data['username'] = self.user.username
+        return data
