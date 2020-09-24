@@ -1,13 +1,24 @@
 from rest_framework.response import Response
 from rest_framework import generics
 from .models import Task, Company, Solution, Difficulty
-from .serializers import TaskSerializer, CompanySerializer, SolutionSerializer, MyTokenObtainPairSerializer, RegisterForm
+from .serializers import TaskSerializer, CompanySerializer, SolutionSerializer, MyTokenObtainPairSerializer, RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 import json
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 
 # Create your views here.
+
+
+class RegisterAPI(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+    queryset = User.objects.all()
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+        return Response({'status': '200', 'message': serializer.data}, status=200)
 
 
 class TaskAPI(generics.GenericAPIView):
@@ -68,10 +79,3 @@ class SolutionAPI(generics.GenericAPIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
-
-class RegisterAPI(generic.GenericAPIView):
-    serializer_class = MyTokenObtainPairSerializer
-    queryset = User.objects.all()
-
-    def post(self, request):

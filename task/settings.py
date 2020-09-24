@@ -42,8 +42,13 @@ ALLOWED_HOSTS = [
     'nettel.spdns.eu',
     '0.0.0.0',
     '127.0.0.1',
+    'localhost',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:61133",
+    "http://127.0.0.1:61133",
+]
 
 # Application definition
 
@@ -56,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'data',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +72,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'task.urls'

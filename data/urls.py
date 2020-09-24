@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TaskAPI, CompanyAPI, SolutionAPI, MyTokenObtainPairView
+from .views import TaskAPI, CompanyAPI, SolutionAPI, MyTokenObtainPairView, RegisterAPI
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('task/', TaskAPI.as_view()),
+    path('register/', RegisterAPI.as_view()),
     path('company/', CompanyAPI.as_view()),
     path('solution/', SolutionAPI.as_view()),
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
