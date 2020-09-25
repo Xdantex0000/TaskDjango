@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Task, Company, Difficulty, Solution, User, UserValidation
-from django.contrib.auth.models import User
+from .models import Task, Company, Difficulty, Solution, User
 from .mailparse import MailParse
 from task import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -9,28 +8,10 @@ import random as rand
 import re
 import json
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
 
 mailparse = MailParse(settings.EMAIL['EMAIL'], settings.EMAIL["PASSWORD"])
-
-class ValidateSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        if UserValidation.objects.get(validated_data['code']) != None:
-            password = validated_data.pop('password')
-            user = UserValidation(**validated_data)
-            user.set_password(password)
-            user.save()
-            return user
-        else:
-            raise 'Not valid'
-
-    
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-        extra_keywargs = {'password': {'write_only': True}}
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -38,9 +19,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
-        for i in range(0,4):
-            user.validationString.append(rand.uniform(0,9))
-        user.save()
+        user.is_active = False
+        for i in range(0, 4):
+            user.validationString += rand.uniform(0, 9)
         send_mail(
             f'Validate your user: {user.username}',
             f'Welcome, {user.username}, your validation code: {user.validationString}',
@@ -48,12 +29,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             [f'{user.email}'],
             fail_silently=False,
         )
+        user.save()
         return user
 
-    class Meta:
-        model = UserValidation
-        fields = ['username', 'password', 'validationString']
+    @staticmethod
+    def validateUser(code, user):
+        if user.validationString == code:
+            user.is_active = True
+            return {'status': '200', 'message': 'You have been validated!'}, 200
+        else:
+            return {'status': '404', 'message': 'Error, code is wrong!'}, 404
 
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -129,15 +118,18 @@ class TaskSerializer(serializers.ModelSerializer):
                     addedTasks += 1
         return f'Added {addedTasks} tasks'
 
+
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = '__all__'
 
+
 class SolutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Solution
         fields = '__all__'
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
