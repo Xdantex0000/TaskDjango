@@ -42,3 +42,5 @@ class Solution(models.Model):
     uuid = models.UUIDField(primary_key = True, default=uuid.uuid4, editable=True)
     programText = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class User(User):

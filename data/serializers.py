@@ -1,30 +1,59 @@
 from rest_framework import serializers
-from .models import Task, Company, Difficulty, Solution
+from .models import Task, Company, Difficulty, Solution, User, UserValidation
 from django.contrib.auth.models import User
 from .mailparse import MailParse
 from task import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+import random as rand
 import re
 import json
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+
 
 mailparse = MailParse(settings.EMAIL['EMAIL'], settings.EMAIL["PASSWORD"])
 
-class RegisterSerializer(serializers.ModelSerializer):
-    
+class ValidateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user
+        if UserValidation.objects.get(validated_data['code']) != None:
+            password = validated_data.pop('password')
+            user = UserValidation(**validated_data)
+            user.set_password(password)
+            user.save()
+            return user
+        else:
+            raise 'Not valid'
 
+    
     class Meta:
         model = User
         fields = ['username', 'password']
         extra_keywargs = {'password': {'write_only': True}}
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        for i in range(0,4):
+            user.validationString.append(rand.uniform(0,9))
+        user.save()
+        send_mail(
+            f'Validate your user: {user.username}',
+            f'Welcome, {user.username}, your validation code: {user.validationString}',
+            'from@gmail.com',
+            [f'{user.email}'],
+            fail_silently=False,
+        )
+        return user
+
+    class Meta:
+        model = UserValidation
+        fields = ['username', 'password', 'validationString']
+
 
 
 class TaskSerializer(serializers.ModelSerializer):
