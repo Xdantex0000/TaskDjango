@@ -35,14 +35,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validateUser(code, username):
-        user = User.objects.get(username=username)
-        print(user.email)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return {'status': '400', 'message': 'User was not found!'}, 404
         if user.validationString == code:
             user.is_active = True
             user.save()
+            user.validationString = ''
             return {'status': '200', 'message': 'You have been validated!'}, 200
         else:
-            return {'status': '404', 'message': 'Error, code is wrong!'}, 404
+            return {'status': '400', 'message': 'Error, code is wrong!'}, 400
 
     class Meta:
         model = User
