@@ -15,15 +15,16 @@ class UserAPI(generics.GenericAPIView):
 
     def post(self, request):
         if 'validation' in request.GET:
-            serializer, status = self.get_serializer(request.data['code'])
+            serializer, status = self.get_serializer().validateUser(
+                request.GET['validation'], request.data['username'])
             return Response(serializer, status=status)
-
         else:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response({'status': '200', 'message': serializer.data}, status=200)
-            return Response({'status': '404', 'message': 'Something is wrong'}, status=404)
+                return Response({'status': '200', 'message': f'Please, validate your account by message on your email {serializer.data["email"]}'}, status=200)
+            else:
+                return Response({'status': '400', 'message': f'{serializer.errors}'}, status=400)
 
 
 class TaskAPI(generics.GenericAPIView):

@@ -20,22 +20,26 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User(**validated_data)
         user.set_password(password)
         user.is_active = False
+        user.validationString = ''
         for i in range(0, 4):
-            user.validationString += rand.uniform(0, 9)
+            user.validationString += str(int(rand.uniform(0, 9)))
         send_mail(
             f'Validate your user: {user.username}',
             f'Welcome, {user.username}, your validation code: {user.validationString}',
             'from@gmail.com',
-            [f'{user.email}'],
+            [f'{user.email}', ],
             fail_silently=False,
         )
         user.save()
         return user
 
     @staticmethod
-    def validateUser(code, user):
+    def validateUser(code, username):
+        user = User.objects.get(username=username)
+        print(user.email)
         if user.validationString == code:
             user.is_active = True
+            user.save()
             return {'status': '200', 'message': 'You have been validated!'}, 200
         else:
             return {'status': '404', 'message': 'Error, code is wrong!'}, 404

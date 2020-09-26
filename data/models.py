@@ -47,4 +47,4 @@ class Solution(models.Model):
 
 
 class User(User):
-    validationString = models.TextField()
+    validationString = models.CharField(max_length=4, null=True, blank=True)
