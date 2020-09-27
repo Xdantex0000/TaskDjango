@@ -17,8 +17,8 @@ class EditorView extends StatelessWidget {
         children: <Widget>[
           UIHelper.verticalSpaceLarge(),
           Expanded(
-            child: Editor(),
-          ),
+              // child: Editor(),
+              ),
         ],
       ),
     )

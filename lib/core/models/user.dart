@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
+
 class User {
   String username;
   String acces;
   String refresh;
-  User({this.username, this.acces, this.refresh});
+  User({@required this.username, @required this.acces, @required this.refresh});
 
   User.initial() : username = '';
 

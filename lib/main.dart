@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tasks/core/services/authentication_service.dart';
 import 'package:tasks/locator.dart';
-import 'package:tasks/ui/router.dart';
+import 'package:tasks/ui/router.dart' as rt;
 import 'package:tasks/ui/shared/theme.dart';
 
 import 'core/models/user.dart';
@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: AppTheme,
-        initialRoute: 'login',
-        onGenerateRoute: Router.generateRoute,
+        initialRoute: 'startup/',
+        onGenerateRoute: rt.Router.generateRoute,
       ),
     );
   }

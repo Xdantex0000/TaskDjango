@@ -1,7 +1,10 @@
 import 'package:code_editor/code_editor.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tasks/core/models/task.dart';
 
 class Editor extends StatelessWidget {
+  final Task task;
+  Editor(this.task);
   @override
   Widget build(BuildContext context) {
     List<String> contentOfPage1 = [
@@ -34,6 +37,7 @@ class Editor extends StatelessWidget {
         onSubmit: (String language, String value) {
           print("language = $language");
           print("value = '$value'");
+          task.solution = value;
         },
       ),
     );

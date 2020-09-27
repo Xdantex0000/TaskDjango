@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tasks/core/enums/viewstate.dart';
 import 'package:tasks/core/models/user.dart';
-import 'package:tasks/core/viewmodels/task_viewmodel.dart';
+import 'package:tasks/core/viewmodels/tasklist_viewmodel.dart';
 import 'package:tasks/ui/shared/app_colors.dart';
 import 'package:tasks/ui/shared/text_styles.dart';
 import 'package:tasks/ui/shared/ui_helpers.dart';

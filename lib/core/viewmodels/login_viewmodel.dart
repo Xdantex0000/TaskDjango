@@ -10,24 +10,28 @@ class LoginModel extends BaseModel {
 
   String errorMessage;
 
-  Future<bool> login(String input_name, String input_password) async {
+  Future<bool> login(String inputName, String inputPassword) async {
     setState(ViewState.Busy);
 
-    var name = input_name;
-    var password = input_password;
+    var name = inputName;
+    var password = inputPassword;
 
     // Not a number
-    if (name == null || password == null) {
-      errorMessage = 'Value entered is not a number';
+    if (name == '' || password == '') {
+      errorMessage = 'all fields must be filled';
       setState(ViewState.Idle);
       return false;
     }
 
     var success = await _authenticationService.login(name, password);
 
+    if (success != 'OK') {
+      errorMessage = success;
+      setState(ViewState.Idle);
+      return false;
+    }
     // Handle potential error here too.
-
     setState(ViewState.Idle);
-    return success;
+    return true;
   }
 }

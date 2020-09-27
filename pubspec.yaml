@@ -26,6 +26,7 @@ dependencies:
   http: ^0.12.1
   http_interceptor: any
   code_editor: ^1.0.1
+  flutter_secure_storage: ^3.3.4
   flutter:
     sdk: flutter
 

@@ -1,20 +1,19 @@
 import 'package:tasks/core/enums/viewstate.dart';
-import 'package:tasks/core/models/task.dart';
+import 'package:tasks/core/models/user.dart';
 import 'package:tasks/core/services/api.dart';
+import 'package:tasks/core/viewmodels/base_model.dart';
+import 'package:tasks/locator.dart';
 
-import '../../locator.dart';
-import 'base_model.dart';
-
-class TaskListViewModel extends BaseModel {
+class TaskViewModel extends BaseModel {
   Api _api = locator<Api>();
+  // Srting result = ''
 
-  List<Task> tasks;
-
-  Future fetchTasks(String companyName) async {
+  String result = '';
+  Future<String> sendSolution(String solution, User user) async {
     setState(ViewState.Busy);
-    // comments = await _api.getCommentsForPost(postId);
-    // comments = [];
-    tasks = await _api.getTasksByCompany(companyName);
+    result = await _api.sendSolution(solution, user);
+
     setState(ViewState.Idle);
+    return result;
   }
 }
