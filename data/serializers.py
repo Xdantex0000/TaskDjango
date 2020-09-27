@@ -9,6 +9,7 @@ import re
 import json
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import send_mail
+from sandboxapi import cuckoo
 
 
 mailparse = MailParse(settings.EMAIL['EMAIL'], settings.EMAIL["PASSWORD"])
