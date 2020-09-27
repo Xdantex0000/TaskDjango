@@ -10,6 +10,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class UserAPI(generics.GenericAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'status': '200', 'username': request.user.username}, status=200)
+
+
+class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     queryset = User.objects.all()
 
@@ -17,7 +25,7 @@ class UserAPI(generics.GenericAPIView):
         if 'validation' in request.GET:
             serializer, status = self.get_serializer().validateUser(
                 request.GET['validation'], request.data['username'])
-            return Response(serializer, status=status)
+            return Response(serializer, stзшatus=status)
         else:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
