@@ -2,16 +2,15 @@ import 'package:flutter/cupertino.dart';
 
 class User {
   String username;
-  String acces;
-  String refresh;
-  User({@required this.username, @required this.acces, @required this.refresh});
+
+  User({
+    @required this.username,
+  });
 
   User.initial() : username = '';
 
   User.fromJson(Map<String, dynamic> json) {
     username = json['username'];
-    acces = json['access'];
-    refresh = json['refresh'];
   }
 
   // Map<String, dynamic> toJson() {

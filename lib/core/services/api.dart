@@ -13,12 +13,44 @@ class Api {
   static const endpoint = 'https://testenglish.spdns.eu';
 
   var client = new http.Client();
-  final StorageService _storage = locator<StorageService>();
+  StorageService _storage = locator<StorageService>();
 
   var header = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8'
   };
 
+  //help function
+  // returns default header with authorization
+  Map<String, String> addAuthCookie(String token) {
+    return <String, String>{
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json; charset=UTF-8'
+    };
+  }
+
+  //function tries to refresh tiken and resend request
+  Future<Map<String, dynamic>> tryRefresh(http.Response response) async {
+    var parsed = json.decode(response.body) as Map<String, dynamic>;
+    if (parsed.containsKey('code')) {
+      // tries to refresh tokens, on succes resends request
+      //outherway returns empty dict
+      if (parsed['code'] == 'token_not_valid') {
+        String refresh = await _storage.getRefreshToken();
+        Map<String, dynamic> info = await refreshToken(refresh);
+        if (info.length != 0 && !info.containsKey('error')) {
+          await _storage.setNewTokenPair(info['access'], info['refresh']);
+          return <String, dynamic>{'message': info['access'], 'status': true};
+        }
+        return <String, dynamic>{'message': info['error'], 'status': false};
+      }
+      return <String, dynamic>{
+        'message': 'problem not in refresh',
+        'status': false
+      };
+    }
+  }
+
+  // prints response
   void helpPrint(var response) {
     print('statusCode : ' + response.statusCode.toString());
 
@@ -33,7 +65,52 @@ class Api {
     }
   }
 
-  Future<bool> refreshToken(String token) async {
+  //get user ptofile info
+  Future<Map<String, dynamic>> getProfile(String token) async {
+    var response = await client.get(
+      '$endpoint/api/userData/',
+      headers: addAuthCookie(token),
+    );
+    helpPrint(response);
+    if (response.statusCode == 200) {
+      var parsed = json.decode(response.body) as Map<String, dynamic>;
+      return parsed;
+    } else if (response.statusCode == 401) {
+      var result = await tryRefresh(response);
+      if (result['status']) {
+        return await getProfile(result['message']);
+      } else {
+        return <String, dynamic>{
+          'error': result['message'],
+        };
+      }
+    }
+    return <String, dynamic>{
+      'error': response.body.toString(),
+    };
+  }
+
+  // sends logout request
+  Future<bool> logout(String token) async {
+    var response = await client.post(
+      '$endpoint/api/token/logout/',
+      headers: header,
+      body: jsonEncode(
+        {'refresh': token},
+      ),
+    );
+    helpPrint(response);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //sends reuest to update tokens
+  // on success return map with access and refresh tokens adnd user profile info
+  // outherway return empty dict
+  Future<Map<String, dynamic>> refreshToken(String token) async {
     var response = await client.post(
       '$endpoint/api/token/refresh/',
       body: jsonEncode(
@@ -44,32 +121,44 @@ class Api {
     helpPrint(response);
     if (response.statusCode == 200) {
       var parsed = json.decode(response.body);
-      await _storage.setNewTokenPair(parsed['access'], token);
-      return true;
+      return parsed;
     } else {
-      return false;
+      return <String, dynamic>{
+        'error': response.body.toString(),
+      };
     }
   }
 
-  Map<String, String> addAuthCookie(User user) {
-    return <String, String>{
-      'Authorization': 'Bearer ${user.acces}',
-      'Content-Type': 'application/json; charset=UTF-8'
-    };
-  }
-
-  Future<String> sendSolution(String text, User user) async {
-    print(addAuthCookie(user));
+  // uploads solution to the server
+  Future<Map<String, dynamic>> sendSolution(String text) async {
+    String access = await _storage.getAccessToken();
     var response = await client.post(
       '$endpoint/api/solution/',
-      headers: addAuthCookie(user),
+      headers: addAuthCookie(access),
       body: jsonEncode({'programText': text}),
     );
     helpPrint(response);
-    var parsed = json.decode(response.body) as Map<String, dynamic>;
-    return parsed.toString();
+    //if response status code is 200, just return response body
+    if (response.statusCode == 200) {
+      var parsed = json.decode(response.body) as Map<String, dynamic>;
+      return parsed;
+      // if response code 401, checks if token was expired
+    } else if (response.statusCode == 401) {
+      var result = await tryRefresh(response);
+      if (result['status']) {
+        return await sendSolution(text);
+      } else {
+        return <String, dynamic>{
+          'error': result['message'],
+        };
+      }
+    }
+    return <String, dynamic>{
+      'error': response.body.toString(),
+    };
   }
 
+  // get all companies
   Future<List<Company>> getAllCompanies() async {
     List<Company> result = List<Company>();
 
@@ -81,6 +170,7 @@ class Api {
     return result;
   }
 
+  // gets all tasks from one company
   Future<List<Task>> getTasksByCompany(String companyName) async {
     List<Task> result = List<Task>();
     var response = await client.get(
@@ -95,9 +185,9 @@ class Api {
     return result;
   }
 
-  Future<Map<String, dynamic>> getUserProfile(
-      String name, String password) async {
-    // Get user profile for id
+  // sends login request
+  // on success return response body
+  Future<Map<String, dynamic>> login(String name, String password) async {
     var response = await client.post(
       '$endpoint/api/token/',
       headers: header,
@@ -118,6 +208,7 @@ class Api {
     }
   }
 
+  // register user
   Future<Map<String, dynamic>> registerUser(
       String name, String password) async {
     // Get user profile for id

@@ -11,8 +11,8 @@ class TaskViewModel extends BaseModel {
   String result = '';
   Future<String> sendSolution(String solution, User user) async {
     setState(ViewState.Busy);
-    result = await _api.sendSolution(solution, user);
-
+    var temp = await _api.sendSolution(solution);
+    result = temp.toString();
     setState(ViewState.Idle);
     return result;
   }

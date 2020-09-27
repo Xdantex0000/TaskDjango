@@ -42,45 +42,47 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return BaseView<LoginModel>(
-      builder: (context, model, child) => Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            LoginHeader(
-              validationMessage: model.errorMessage,
-              controller_name: widget._controllerName,
-              controller_password: widget._controllerPassword,
-            ),
-            model.state == ViewState.Busy
-                ? CircularProgressIndicator()
-                : FlatButton(
-                    color: Colors.white,
-                    child: Text(
-                      'Login',
-                      style: TextStyle(color: Colors.black),
+      builder: (context, model, child) {
+        return Scaffold(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              LoginHeader(
+                validationMessage: model.errorMessage,
+                controller_name: widget._controllerName,
+                controller_password: widget._controllerPassword,
+              ),
+              model.state == ViewState.Busy
+                  ? CircularProgressIndicator()
+                  : FlatButton(
+                      color: Colors.white,
+                      child: Text(
+                        'Login',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () async {
+                        var loginSuccess = await model.login(
+                            widget._controllerName.text,
+                            widget._controllerPassword.text);
+                        if (loginSuccess) {
+                          Navigator.pushNamed(context, 'company/');
+                        }
+                      },
                     ),
-                    onPressed: () async {
-                      var loginSuccess = await model.login(
-                          widget._controllerName.text,
-                          widget._controllerPassword.text);
-                      if (loginSuccess) {
-                        Navigator.pushNamed(context, '/');
-                      }
-                    },
-                  ),
-            UIHelper.verticalSpaceSmall(),
-            InkWell(
-              child: signUpText,
-              onTap: () {
-                Navigator.pushNamed(context, 'signup/');
-              },
-              onHover: (ch) {
-                redirectWasHooved(ch);
-              },
-            )
-          ],
-        ),
-      ),
+              UIHelper.verticalSpaceSmall(),
+              InkWell(
+                child: signUpText,
+                onTap: () {
+                  Navigator.pushNamed(context, 'signup/');
+                },
+                onHover: (ch) {
+                  redirectWasHooved(ch);
+                },
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -8,7 +8,6 @@ class CompanyViewModel extends BaseModel {
   Api _api = locator<Api>();
 
   List<Company> companies;
-
   Future fetchCompanies() async {
     setState(ViewState.Busy);
     companies = await _api.getAllCompanies();

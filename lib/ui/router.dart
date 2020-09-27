@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tasks/core/models/task.dart';
+import 'package:tasks/core/viewmodels/profile_viewmodel.dart';
 import 'package:tasks/ui/views/comapnies_page.dart';
-import 'package:tasks/ui/views/edit_view.dart';
 import 'package:tasks/ui/views/login_view.dart';
+import 'package:tasks/ui/views/profile_view.dart';
 import 'package:tasks/ui/views/startup_view.dart';
 import 'package:tasks/ui/views/task_view.dart';
 import 'package:tasks/ui/views/tasklist_view.dart';
@@ -15,16 +16,16 @@ class Router {
     switch (settings.name) {
       case 'startup/':
         return MaterialPageRoute(builder: (_) => StartUpView());
-      case '/':
+      case 'profile/':
+        return MaterialPageRoute(builder: (_) => ProfileView());
+      case 'company/':
         return MaterialPageRoute(builder: (_) => CompanyListView());
-      case 'editor':
-        return MaterialPageRoute(builder: (_) => EditorView());
       case 'login/':
         return MaterialPageRoute(builder: (_) => LoginView());
       case 'task':
         var task = settings.arguments as Task;
         return MaterialPageRoute(
-          builder: (_) => TaskView(
+          builder: (_) => TaskView( 
             task: task,
           ),
         );

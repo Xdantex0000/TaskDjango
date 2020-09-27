@@ -16,10 +16,10 @@ class StartUpViewModel extends BaseModel {
     var hasLoggedInUser = await _authenticationService.isUserLoggedIn();
     print(hasLoggedInUser);
     if (hasLoggedInUser) {
-      Navigator.pushNamed(context, '/');
+      Navigator.popAndPushNamed(context, 'company/');
       // _navigationService.navigateTo(HomeViewRoute);
     } else {
-      Navigator.pushNamed(context, 'login/');
+      Navigator.popAndPushNamed(context, 'login/');
       // _navigationService.navigateTo(LoginViewRoute);
     }
   }

@@ -12,8 +12,6 @@ class TaskListViewModel extends BaseModel {
 
   Future fetchTasks(String companyName) async {
     setState(ViewState.Busy);
-    // comments = await _api.getCommentsForPost(postId);
-    // comments = [];
     tasks = await _api.getTasksByCompany(companyName);
     setState(ViewState.Idle);
   }
